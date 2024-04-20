@@ -1,7 +1,7 @@
 # 569S OpenALPR
 
 ## Driver Instruction
-Download openalpr and run:
+Set up:
 ```
 sudo apt install -y libopencv-dev libtesseract-dev git cmake build-essential libleptonica-dev liblog4cplus-dev libcurl3-dev
 sudo apt install beanstalkd
