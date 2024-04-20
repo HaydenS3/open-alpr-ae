@@ -12,6 +12,7 @@ cd build
 cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DCMAKE_INSTALL_SYSCONFDIR:PATH=/etc ..
 make
 sudo make install
+cd ..
 sudo python3 bindings/python/setup.py install
 ```
 Now you are all set with environment:
