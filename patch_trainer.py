@@ -5,13 +5,13 @@ import random
 parser = ArgumentParser(description='OpenALPR Python Test Program')
 
 parser.add_argument("-c", "--country", dest="country", action="store", default="us",
-                  help="License plate Country" )
+                    help="License plate Country")
 
 parser.add_argument("--config", dest="config", action="store", default="conf.txt",
-                  help="Path to openalpr.conf config file" )
+                    help="Path to openalpr.conf config file")
 
 parser.add_argument("--runtime_data", dest="runtime_data", action="store", default="runtime_data",
-                  help="Path to OpenALPR runtime_data directory" )
+                    help="Path to OpenALPR runtime_data directory")
 
 parser.add_argument('--plate_image', help='License plate image file')
 
@@ -30,19 +30,22 @@ try:
         alpr.set_default_region("wa")
         alpr.set_detect_region(False)
         jpeg_bytes = open(options.plate_image, "rb").read()
-        print(jpeg_bytes)
         loop = True
-        while(loop):
+        while (loop):
+            jpeg_bytes = bytes(jpeg_bytes)
             results = alpr.recognize_array(jpeg_bytes)
+            jpeg_bytes = bytearray(jpeg_bytes)
 
-            if(len(results) == 0):
+            print(results)
+
+            if (len(results) == 0):
                 loop = False
             else:
-                patch = []
-                for i in range(0,len(jpeg_bytes)):
-                    patch += chr(256*random.random())
-                jpeg_bytes += bytes(patch, 'utf-8')
-
+                for i in range(0, len(jpeg_bytes)):
+                    sum = jpeg_bytes[i] + int(256*random.random())
+                    jpeg_bytes[i] = sum % 256
+                with open('output.jpg', 'wb') as f:
+                    f.write(jpeg_bytes)
 
 
 finally:
