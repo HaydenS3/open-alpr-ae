@@ -15,6 +15,13 @@ sudo make install
 cd ..
 sudo python3 bindings/python/setup.py install
 ```
+
+if Alpr not found - Hayden
+`pip3 install -e openalpr/src/bindings/python`
+
+if AttributeError: 'Alpr' object has no attribute 'loaded'
+`conda install -c conda-forge gcc=12.1.0`
+
 Now you are all set with environment:
 ```
 sicheng@Sicheng:~/569S/open-alpr-ae$ python alpr_driver.py --plate_image dataset2/images/Cars6.png
