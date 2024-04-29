@@ -51,7 +51,7 @@ def adversarial_attack(img_path, target_label):
     print("Adversarial prediction:", adv_label)
 
 # Example usage
-img_path = "path/to/image.jpg"
+img_path = input('Enter path to file: ')
 target_label = 22  # Change this to the target class you want
 adversarial_attack(img_path, target_label)
 
