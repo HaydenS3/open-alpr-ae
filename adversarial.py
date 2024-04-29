@@ -6,7 +6,7 @@ from tensorflow.keras.applications.resnet50 import preprocess_input, decode_pred
 import openalpr
 
 # Load the OpenALPR model
-alpr = openalpr.Alpr("us", "path/to/config/file", "path/to/runtime_data")
+alpr = openalpr.Alpr("us", "conf.txt", "runtime_data")
 if not alpr.is_loaded():
     print("Error loading OpenALPR")
     exit(1)
