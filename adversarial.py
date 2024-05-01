@@ -1,9 +1,11 @@
+import os
 import numpy as np
 import tensorflow as tf
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
 import openalpr
+import cv2
 
 # Load the OpenALPR model
 alpr = openalpr.Alpr("us", "conf.txt", "runtime_data")
@@ -38,10 +40,19 @@ def adversarial_attack(img_path, target_label):
     target = tf.one_hot(target_label, 1000)
     target = tf.reshape(target, (1, 1000))
 
+    # make log file
+    newpath = r'./log' 
+    if not os.path.exists(newpath):
+        os.makedirs(newpath)
+
+    epoch = 0
     with tf.GradientTape() as tape:
         tape.watch(img)
         prediction = model(img)
         loss = tf.keras.losses.categorical_crossentropy(target, prediction)
+
+        # save prediction in log folder
+        # cv2.imwrite("{epoch}.jpg", prediction)
 
     gradient = tape.gradient(loss, img)
     perturbation = 0.01 * tf.sign(gradient)
