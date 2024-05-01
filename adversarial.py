@@ -53,6 +53,7 @@ def adversarial_attack(img_path, target_label):
 
         # save prediction in log folder
         # cv2.imwrite("{epoch}.jpg", prediction)
+        # epoch = epoch + 1
 
     gradient = tape.gradient(loss, img)
     perturbation = 0.01 * tf.sign(gradient)
