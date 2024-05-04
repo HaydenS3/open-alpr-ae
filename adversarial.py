@@ -1,9 +1,8 @@
 import os
 import numpy as np
 import tensorflow as tf
-from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.preprocessing import image
-from tensorflow.keras.applications.resnet50 import preprocess_input, decode_predictions
+import pytesseract
 import openalpr
 import cv2
 
@@ -13,60 +12,41 @@ if not alpr.is_loaded():
     print("Error loading OpenALPR")
     exit(1)
 
-# Load ResNet50 model for crafting adversarial examples
-model = ResNet50(weights='imagenet')
-
 def preprocess_image(img_path):
-    img = image.load_img(img_path, target_size=(224, 224))
-    x = image.img_to_array(img)
-    x = np.expand_dims(x, axis=0)
-    x = preprocess_input(x)
-    return x
+    img = cv2.imread(img_path)
+    img = cv2.resize(img, (224, 224))  # Resize image to match model input size
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)  # Convert to grayscale
+    img = np.expand_dims(img, axis=2)  # Add channel dimension
+    img = img.astype(np.float32)
+    return img
 
-def predict_with_openalpr(img_path):
-    results = alpr.recognize_file(img_path)
-    if results['results']:
-        plate = results['results'][0]['plate']
-        return plate
-    else:
-        return None
+def predict_with_ocr(img_path):
+    img = cv2.imread(img_path)
+    text = pytesseract.image_to_string(img)
+    return text
 
-def adversarial_attack(img_path, target_label):
+def adversarial_attack(img_path, target_text):
     img = preprocess_image(img_path)
-    orig_pred = model.predict(img)
-    orig_label = decode_predictions(orig_pred, top=1)[0][0][1]
-    print("Original prediction:", orig_label)
 
-    target = tf.one_hot(target_label, 1000)
-    target = tf.reshape(target, (1, 1000))
+    # Get original prediction
+    orig_text = predict_with_ocr(img_path)
+    print("Original prediction:", orig_text)
 
-    # make log file
-    newpath = r'./log' 
-    if not os.path.exists(newpath):
-        os.makedirs(newpath)
+    # Generate adversarial example by adding noise
+    adv_img = img + np.random.normal(scale=10, size=img.shape)
 
-    epoch = 0
-    with tf.GradientTape() as tape:
-        tape.watch(img)
-        prediction = model(img)
-        loss = tf.keras.losses.categorical_crossentropy(target, prediction)
+    # Save adversarial image
+    cv2.imwrite("adversarial_image.jpg", adv_img)
 
-        # save prediction in log folder
-        # cv2.imwrite("{epoch}.jpg", prediction)
-        # epoch = epoch + 1
-
-    gradient = tape.gradient(loss, img)
-    perturbation = 0.01 * tf.sign(gradient)
-    adv_img = img + perturbation
-    adv_pred = model.predict(adv_img)
-    adv_label = decode_predictions(adv_pred, top=1)[0][0][1]
-    print("Adversarial prediction:", adv_label)
+    # Get prediction on adversarial example
+    adv_text = predict_with_ocr("adversarial_image.jpg")
+    hex_value = ''.join([format(ord(char), 'x') for char in adv_text])
+    print("Adversarial prediction:", hex_value)
 
 # Example usage
 img_path = input('Enter path to file: ')
-target_label = 22  # Change this to the target class you want
-adversarial_attack(img_path, target_label)
+target_text = input('Enter target license plate text: ')
+adversarial_attack(img_path, target_text)
 
 # Remember to close the OpenALPR instance
 alpr.unload()
-

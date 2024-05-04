@@ -36,14 +36,15 @@ try:
             results = alpr.recognize_array(jpeg_bytes)
             jpeg_bytes = bytearray(jpeg_bytes)
 
-            print(results)
+            print(results['results'])
 
-            if (len(results) == 0):
+            if (len(results['results']) == 0):
                 loop = False
             else:
-                for i in range(0, len(jpeg_bytes)):
-                    sum = jpeg_bytes[i] + int(256*random.random())
-                    jpeg_bytes[i] = sum % 256
+                print(len(jpeg_bytes))
+                for i in range(500, len(jpeg_bytes)):
+                    sum = jpeg_bytes[i] + int(255*random.random())
+                    jpeg_bytes[i] = sum % 255
                 with open('output.jpg', 'wb') as f:
                     f.write(jpeg_bytes)
 
