@@ -59,7 +59,7 @@ def adversarial_attack(img_path, target_text, epochs=10):
 
         # Get original prediction
         orig_text = predict_with_ocr(img_path)
-        print("Original prediction:", orig_text)
+        #print("Original prediction:", orig_text)
 
         # Generate adversarial example using Fast Gradient Sign Method (FGSM)
         with tf.GradientTape() as tape:
@@ -89,7 +89,7 @@ def adversarial_attack(img_path, target_text, epochs=10):
 
         # Get prediction on adversarial example
         adv_text = predict_with_ocr("adversarial_image.jpg")
-        print("Adversarial prediction:", adv_text)
+        #print("Adversarial prediction:", adv_text)
 
 def test_adversarial_with_openalpr(adversarial_img_path):
     result = alpr.recognize_file(adversarial_img_path)
@@ -109,8 +109,36 @@ img_path = "dataset2/images/Cars16.png"
 target_text = 3
 adversarial_attack(img_path, target_text, epochs=10)
 
-# Test adversarial image with OpenALPR
 test_adversarial_with_openalpr("adversarial_image.jpg")
+
+# Define the output directory
+output_directory = "output"
+
+# Create the output directory if it doesn't exist
+if not os.path.exists(output_directory):
+    os.makedirs(output_directory)
+
+# Perform the operation for all files in the dataset2 directory
+directory = "dataset2/images"
+count = 1
+for file in os.listdir(directory):
+    filename = os.fsdecode(file)
+    print("Count: {}".format(count))
+    count += 1
+    if filename.endswith(".png"):
+        # Perform your desired actions on the file
+        img_path = os.path.join(directory, filename)
+        print("Original: ")
+        test_adversarial_with_openalpr(img_path)
+        adversarial_attack(img_path, target_text, epochs=10)
+        print("Adversarial:")
+        test_adversarial_with_openalpr("adversarial_image.jpg")
+        
+        # Save the adversarial image with a numbered filename in the output directory
+        output_filename = os.path.join(output_directory, f"adversarial_{filename}")
+        os.rename("adversarial_image.jpg", output_filename)
+    else:
+        continue
 
 # Remember to close the OpenALPR instance
 alpr.unload()
