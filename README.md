@@ -36,3 +36,17 @@ Plate #1
   -        02I1N   79.027061
   -        0Z11N   77.920334
 ```
+
+## Create Random Patch
+
+```
+python patch_trainer.py --plate_image dataset2/images/Cars6.png
+```
+
+## Create Targeted Patch
+
+```
+sudo apt install tessaract-ocr
+pip3 install pytesseract
+python adversarial.py
+```
