@@ -68,7 +68,7 @@ def adversarial_attack(img_path, target_text, epochs=10):
             loss = -tf.keras.losses.sparse_categorical_crossentropy([target_text], prediction)
 
         gradient = tape.gradient(loss, img_tensor)
-        perturbation = 0.1 * np.sign(gradient)  # Increase perturbation magnitude
+        perturbation = 0.01 * np.sign(gradient)  # Increase perturbation magnitude
         adv_img = img_tensor + perturbation
 
         # Clip the perturbed image to [0, 255] range
@@ -106,7 +106,7 @@ def test_adversarial_with_openalpr(adversarial_img_path):
 #img_path = input('Enter path to file: ')
 img_path = "dataset2/images/Cars16.png"
 #target_text = input('Enter target license plate text: ')
-target_text = 3
+target_text = 1
 adversarial_attack(img_path, target_text, epochs=10)
 
 test_adversarial_with_openalpr("adversarial_image.jpg")
